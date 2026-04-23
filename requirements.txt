@@ -1,0 +1,26 @@
+# UI Framework
+PyQt5==5.15.10
+PyQt5-Qt5==5.15.2
+PyQt5-sip==12.13.0
+
+# Network & Packet Analysis
+scapy==2.5.0
+netifaces==0.11.0
+
+# Machine Learning
+torch==2.1.0
+torchvision==0.16.0
+numpy==1.24.3
+scikit-learn==1.3.0
+
+# Alerts
+twilio==8.10.0
+
+# Data Processing
+pandas==2.0.3
+
+# System Utilities
+psutil==5.9.5
+
+# Optional but recommended
+requests==2.31.0

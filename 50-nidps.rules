@@ -1,0 +1,7 @@
+// /etc/polkit-1/rules.d/50-nidps.rules
+// Grants passwordless execution of NIDPS for any active local user.
+polkit.addRule(function(action, subject) {
+    if (action.id === "org.nidps.run" && subject.local && subject.active) {
+        return polkit.Result.YES;
+    }
+});

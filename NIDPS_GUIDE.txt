@@ -1,0 +1,470 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║              ⚡ NIDPS — Network Intrusion Detection & Prevention System       ║
+║                          Complete Reference Guide                             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  TABLE OF CONTENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  1. Project Overview
+  2. System Requirements
+  3. Installation Guide
+  4. Desktop Icon Setup
+  5. First Launch & Login
+  6. Application Tabs
+  7. Detected Attack Types
+  8. Attack Testing Suite
+  9. GNN Model Training Guide
+ 10. Alert Configuration
+ 11. Prevention Engine
+ 12. Troubleshooting
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. PROJECT OVERVIEW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  NIDPS is a professional-grade Network Intrusion Detection & Prevention
+  System built for Linux. It combines three detection methods:
+
+    • Signature-based  — matches packets against known threat signatures
+    • Anomaly-based    — detects statistical deviations from normal traffic
+    • GNN-based        — Graph Neural Network model for deep packet analysis
+
+  Key capabilities:
+    • Real-time packet capture and analysis using Scapy
+    • Detection of 10+ attack categories
+    • Automatic IP blocking via iptables
+    • SMS/email alert integration (Twilio)
+    • Built-in attack simulation for testing
+    • Custom GNN model training from CSV, PCAP, or live traffic
+    • Futuristic dark UI with live dashboards and visualizations
+
+  Version  : 6.0
+  Platform : Ubuntu / Debian Linux (requires root for packet capture)
+  Framework: PyQt5, PyTorch, Scapy
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  2. SYSTEM REQUIREMENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Operating System  : Ubuntu 20.04+ / Debian 11+ (64-bit)
+  Python            : 3.8 or higher
+  RAM               : 4 GB minimum (8 GB recommended for training)
+  Disk              : 2 GB free space
+  Network           : Root access required for raw packet capture
+  GPU (optional)    : CUDA-compatible GPU accelerates GNN training
+
+  Required system packages:
+    sudo apt install python3 python3-pip python3-venv python3-dev \
+                     libpcap-dev tcpdump build-essential
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  3. INSTALLATION GUIDE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  STEP 1 — Install system dependencies
+  ─────────────────────────────────────
+    sudo apt update
+    sudo apt install python3 python3-pip python3-venv python3-dev \
+                     libpcap-dev tcpdump build-essential -y
+
+  STEP 2 — Extract the project
+  ─────────────────────────────
+    unzip nidps-professional.zip
+    cd nidps-professional
+
+  STEP 3 — Create Python virtual environment (recommended)
+  ─────────────────────────────────────────────────────────
+    python3 -m venv venv
+    source venv/bin/activate
+
+  STEP 4 — Install Python dependencies
+  ──────────────────────────────────────
+    pip install --upgrade pip
+    pip install -r requirements.txt
+
+    NOTE: PyTorch (torch) is the largest package (~800 MB).
+    If you have a slow connection, install it separately first:
+      pip install torch==2.1.0 --index-url https://download.pytorch.org/whl/cpu
+
+  STEP 5 — Verify installation
+  ─────────────────────────────
+    python3 -c "import PyQt5, scapy, torch; print('All OK')"
+
+  STEP 6 — Run from terminal (optional, to verify before icon setup)
+  ───────────────────────────────────────────────────────────────────
+    source venv/bin/activate
+    sudo -E env PATH=$PATH python3 main.py
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  4. DESKTOP ICON SETUP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Run this ONE TIME to create the desktop shortcut and enable
+  passwordless launch via polkit:
+
+    sudo bash install_desktop.sh
+
+  What this does:
+    • Installs /usr/local/bin/nidps-run  (privileged launcher)
+    • Installs polkit policy + rules      (grants root access without password)
+    • Installs the NIDPS icon system-wide
+    • Creates NIDPS.desktop on your ~/Desktop
+    • Registers NIDPS in the system app menu
+
+  After setup, double-click the NIDPS icon on your Desktop.
+  The app launches directly — no password prompt.
+
+  GNOME NOTE: If the icon shows "Untrusted Launcher":
+    Right-click → "Allow Launching" → then double-click.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  5. FIRST LAUNCH & LOGIN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Default credentials:
+    Username : admin
+    Password : admin
+
+  IMPORTANT: Change the default password immediately after first login.
+    → Click your username in the top-right header → Profile → Change Password
+
+  Credentials are stored as SHA-256 hashes in:
+    ~/.config/NIDPS/credentials.json
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  6. APPLICATION TABS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  MONITOR
+    Live packet stream table showing source/destination IPs, protocol,
+    packet size, threat classification, confidence score, and action taken.
+    Use the START/STOP button in the left panel to begin capturing.
+    Select the network interface from the header bar dropdown.
+
+  ALERTS
+    All detected threats listed with severity (Critical / High / Medium).
+    Filter by severity, export to CSV, or clear the list.
+
+  HISTORY
+    Searchable log of all past packets and alerts stored in the SQLite
+    database. Filter by date range, IP, protocol, or threat type.
+
+  ANALYTICS
+    Charts and statistics: top source IPs, attack type distribution,
+    traffic volume over time, detection accuracy summary.
+
+  TRAIN
+    Train or retrain the GNN model using your own data.
+    See Section 9 for the full training guide.
+
+  LOGS
+    Raw application event log — useful for debugging errors or reviewing
+    system activity.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  7. DETECTED ATTACK TYPES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  NIDPS detects the following threat categories in real time:
+
+  ┌─────────────────────────────┬──────────────────────────────────────────┐
+  │ Attack / Threat Type        │ Detection Method                         │
+  ├─────────────────────────────┼──────────────────────────────────────────┤
+  │ Port Scan                   │ Counts unique ports contacted per source │
+  │                             │ IP within a sliding time window.         │
+  │                             │ Threshold: 20+ ports in 60 seconds.      │
+  ├─────────────────────────────┼──────────────────────────────────────────┤
+  │ SYN Flood Attack            │ Tracks TCP SYN packets per source.       │
+  │                             │ Threshold: 100+ SYN packets in 5 sec.   │
+  ├─────────────────────────────┼──────────────────────────────────────────┤
+  │ DDoS Attack                 │ Monitors overall packet rate per source. │
+  │  (UDP Flood / ICMP Flood)   │ Threshold: 1000+ packets in 10 seconds.  │
+  ├─────────────────────────────┼──────────────────────────────────────────┤
+  │ XMAS Scan                   │ Detects TCP packets with FIN+PSH+URG     │
+  │                             │ flags set simultaneously.                │
+  ├─────────────────────────────┼──────────────────────────────────────────┤
+  │ NULL Scan                   │ Detects TCP packets with no flags set.   │
+  ├─────────────────────────────┼──────────────────────────────────────────┤
+  │ Malware Communication       │ Matches destination ports against known  │
+  │                             │ malware C2 port list (e.g. 4444, 1337,  │
+  │                             │ 31337, 12345, 54321, etc.)               │
+  ├─────────────────────────────┼──────────────────────────────────────────┤
+  │ Suspicious Port Access      │ Flags connections to sensitive ports     │
+  │                             │ including Telnet (23), RDP (3389),       │
+  │                             │ VNC (5900), IRC (6667).                  │
+  ├─────────────────────────────┼──────────────────────────────────────────┤
+  │ Known Malicious Source      │ Compares source IPs against a built-in   │
+  │                             │ blocklist of known bad actors.           │
+  ├─────────────────────────────┼──────────────────────────────────────────┤
+  │ Malformed Packet            │ Detects packets with invalid/unexpected  │
+  │                             │ structure or protocol anomalies.         │
+  ├─────────────────────────────┼──────────────────────────────────────────┤
+  │ GNN Detected Anomaly        │ The trained Graph Neural Network flags   │
+  │                             │ traffic patterns that deviate from the   │
+  │                             │ learned baseline, catching novel threats │
+  │                             │ not covered by signatures.               │
+  └─────────────────────────────┴──────────────────────────────────────────┘
+
+  Severity levels assigned automatically:
+    Critical — SYN Flood, DDoS, Known Malicious Source, Malware C2
+    High     — Port Scan, XMAS Scan, NULL Scan, GNN Anomaly
+    Medium   — Suspicious Port, Malformed Packet
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  8. ATTACK TESTING SUITE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Access via menu: Tools → Attack Testing
+
+  The built-in simulator sends safe, controlled traffic to verify that
+  NIDPS detects attacks correctly. Use on your own network only.
+
+  Available simulations:
+
+    Port Scan     — Scans multiple ports on the target to trigger
+                    the port scan detector.
+
+    SYN Flood     — Sends a burst of TCP SYN packets to trigger
+                    the SYN flood threshold.
+
+    ICMP Flood    — Sends rapid ping packets to trigger DDoS detection.
+
+    HTTP Flood    — Simulates a web request flood.
+
+    ARP Spoofing  — Sends crafted ARP replies to simulate a
+                    man-in-the-middle ARP poisoning attack.
+
+  How to use:
+    1. Start monitoring (click START in the left panel).
+    2. Open Tools → Attack Testing.
+    3. Set Target IP (use 127.0.0.1 for local testing).
+    4. Select an attack type and adjust intensity/duration.
+    5. Click Run — watch the Monitor and Alerts tabs for detections.
+
+  NOTE: These simulations generate real network packets. Only use
+  against systems you own or have explicit permission to test.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  9. GNN MODEL TRAINING GUIDE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  The GNN (Graph Neural Network) model learns what "normal" traffic looks
+  like and flags deviations as anomalies. Training on your own network
+  data significantly improves detection accuracy.
+
+  ── ACCESSING THE TRAINER ──────────────────────────────────────────────────
+
+    Click the "Train" tab in the main window.
+
+  ── SUPPORTED DATA SOURCES ─────────────────────────────────────────────────
+
+    1. CSV Dataset    — Labelled network flow data exported from tools
+                        like CICFlowMeter or from public datasets.
+
+    2. PCAP File      — Raw packet capture files (.pcap / .pcapng).
+                        Features are auto-extracted per packet.
+
+    3. Synthetic Data — Generated automatically; useful for a quick
+                        baseline model with no real data needed.
+
+    4. Live Capture   — Capture live traffic for N seconds to build
+                        a training set from your own network.
+
+  ── COMPATIBLE PUBLIC DATASETS ─────────────────────────────────────────────
+
+    The trainer is compatible with these standard IDS datasets:
+
+    • CICIDS2017   — Canadian Institute for Cybersecurity
+                     https://www.unb.ca/cic/datasets/ids-2017.html
+
+    • NSL-KDD      — Improved KDD Cup dataset
+                     https://www.unb.ca/cic/datasets/nsl.html
+
+    • UNSW-NB15    — University of New South Wales
+                     https://research.unsw.edu.au/projects/unsw-nb15-dataset
+
+    • Custom CSV   — Any CSV with numeric feature columns and one
+                     label column (0 = normal, 1 = attack).
+
+  ── CSV FORMAT REQUIREMENTS ────────────────────────────────────────────────
+
+    • Must contain numeric feature columns (any names).
+    • Must contain a label column. Accepted column name patterns:
+        label, Label, class, Class, attack, Attack,
+        category, Category, target, Target
+    • Labels should be binary: 0 (normal) or 1 (attack).
+      Non-binary labels (multi-class strings) are auto-converted.
+    • Rows with missing values are dropped automatically.
+    • Maximum 200,000 rows loaded (larger files are sampled).
+
+  ── TRAINING PARAMETERS ────────────────────────────────────────────────────
+
+    Epochs        — Number of full passes through the training data.
+                    Default: 50. More epochs = better accuracy but
+                    slower. Stop early if validation loss stops improving.
+
+    Learning Rate — Controls how fast the model updates.
+                    Default: 0.001. Lower if training is unstable.
+
+    Batch Size    — Samples processed per gradient step.
+                    Default: 32. Increase for faster training on large
+                    datasets (64 or 128). Decrease if RAM is limited.
+
+    Hidden Dim    — Size of the neural network's hidden layers.
+                    Default: 64. Increase (128/256) for complex datasets.
+
+    Train/Val     — Data split ratio (e.g. 80% train / 20% validation).
+                    Default: 0.8.
+
+  ── STEP-BY-STEP TRAINING ──────────────────────────────────────────────────
+
+    Step 1  Open the Train tab.
+
+    Step 2  Choose data source:
+              • "Load CSV" → browse to your dataset file
+              • "Load PCAP" → browse to a .pcap file
+              • "Synthetic" → generates data automatically
+              • "Live Capture" → starts a timed packet capture
+
+    Step 3  Review the data summary (samples, features, class balance).
+            Imbalanced data (many more normal than attack samples) is
+            handled automatically with weighted loss.
+
+    Step 4  Adjust training parameters if needed (defaults work well
+            for most cases).
+
+    Step 5  Click "Start Training". A live chart shows training loss
+            and validation loss per epoch.
+
+    Step 6  When training completes, click "Save Model".
+            The model is saved to: models/gnn_model.pth
+
+    Step 7  Restart monitoring. The new model loads automatically.
+
+  ── INTERPRETING RESULTS ───────────────────────────────────────────────────
+
+    Good training:
+      • Training loss decreases steadily over epochs.
+      • Validation loss tracks closely (not much higher than train loss).
+      • Final validation accuracy above 90% is considered good.
+
+    Overfitting (bad):
+      • Validation loss increases while training loss keeps dropping.
+      • Fix: reduce epochs, increase dropout, or get more training data.
+
+    Underfitting (bad):
+      • Both losses remain high after many epochs.
+      • Fix: increase hidden_dim, more epochs, or better data quality.
+
+  ── RETRAINING TIPS ────────────────────────────────────────────────────────
+
+    • Retrain periodically as your network traffic patterns change.
+    • Capture 30–60 minutes of normal traffic via "Live Capture" and
+      combine with attack samples for a balanced dataset.
+    • More diverse training data = fewer false positives.
+    • The old model is overwritten on save — keep a backup copy of
+      models/gnn_model.pth before retraining if needed.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  10. ALERT CONFIGURATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Access via: Settings → Alerts
+
+  SMS Alerts (Twilio):
+    1. Create a free account at https://www.twilio.com
+    2. Get your Account SID, Auth Token, and a Twilio phone number.
+    3. Enter credentials in Settings → Alerts → SMS tab.
+    4. Enable SMS and set which severity levels trigger a message.
+
+  Email Alerts:
+    1. Provide your SMTP server details (e.g. smtp.gmail.com, port 587).
+    2. Use an app-specific password for Gmail (not your main password).
+    3. Set recipient email addresses.
+    4. Enable and configure severity thresholds.
+
+  Rate limiting:
+    To prevent alert floods during active attacks, a rate limit of
+    10 alerts per minute is applied by default. Configurable in Settings.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  11. PREVENTION ENGINE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  When an attack is detected, the prevention engine can automatically
+  block the source IP using iptables.
+
+  Configuration (Settings → Prevention):
+    Auto-block          — Enable/disable automatic blocking on detection.
+    Block Duration      — How long an IP stays blocked (default: 1 hour).
+                          Set to 0 for permanent blocks.
+    Permanent Threshold — Number of offences before a permanent block
+                          is applied (default: 5).
+
+  Manual block/unblock:
+    Right-click any alert in the Alerts tab → Block IP / Unblock IP.
+
+  View current blocks:
+    Settings → Prevention → Blocked IPs tab.
+
+  NOTE: Prevention requires iptables and root privileges.
+  Blocked IPs are stored and survive application restarts.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  12. TROUBLESHOOTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Desktop icon does nothing / won't open
+    → Run the installer if you haven't yet:
+        sudo bash install_desktop.sh
+    → Check the launch log for errors:
+        cat /tmp/nidps_launch.log
+    → On GNOME: right-click the icon → "Allow Launching" first.
+
+  "No module named PyQt5" or similar import error
+    → Dependencies not installed. Run:
+        source venv/bin/activate
+        pip install -r requirements.txt
+
+  "Permission denied" or packet capture fails
+    → Application must run as root.
+    → From terminal: sudo -E python3 main.py
+    → Via desktop: re-run sudo bash install_desktop.sh
+
+  No packets appearing in Monitor tab
+    → Confirm the correct network interface is selected (header bar).
+    → Verify your interface is active:  ip link show
+    → Try interface "any" to capture on all interfaces.
+
+  GNN model not loading / using random weights
+    → No model file exists yet. Train one via the Train tab first,
+      then click Save Model. The file is saved to models/gnn_model.pth
+
+  High false positive rate
+    → Retrain the GNN model on traffic from your specific network.
+    → Increase detection thresholds in Settings → Detection.
+
+  Application crashes on startup
+    → Check for errors:  python3 main.py  (in terminal without sudo)
+    → Verify PyQt5 version:  python3 -c "import PyQt5; print(PyQt5.QtCore.QT_VERSION_STR)"
+    → Minimum supported: Qt 5.15
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  END OF GUIDE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

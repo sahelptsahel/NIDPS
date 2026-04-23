@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0d1228"/>
+      <stop offset="100%" stop-color="#070810"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00d9ff" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#00d9ff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="64" cy="64" r="62" fill="url(#bg)" stroke="#00d9ff" stroke-width="1.5" stroke-opacity="0.6"/>
+
+  <!-- Glow effect -->
+  <circle cx="64" cy="64" r="50" fill="url(#glow)" filter="url(#blur)"/>
+
+  <!-- Shield shape -->
+  <path d="M64 18 L90 30 L90 62 Q90 82 64 98 Q38 82 38 62 L38 30 Z"
+        fill="none" stroke="#00d9ff" stroke-width="2.5" stroke-linejoin="round" opacity="0.9"/>
+
+  <!-- Inner shield fill -->
+  <path d="M64 22 L87 33 L87 62 Q87 79 64 94 Q41 79 41 62 L41 33 Z"
+        fill="#00d9ff" fill-opacity="0.07"/>
+
+  <!-- Lightning bolt -->
+  <path d="M70 36 L56 62 L65 62 L58 90 L76 58 L66 58 Z"
+        fill="#00d9ff" stroke="#00d9ff" stroke-width="0.5" stroke-linejoin="round"/>
+
+  <!-- Orbit rings -->
+  <ellipse cx="64" cy="64" rx="54" ry="14" fill="none" stroke="#00d9ff" stroke-width="0.8"
+           stroke-opacity="0.25" transform="rotate(-20 64 64)"/>
+  <ellipse cx="64" cy="64" rx="54" ry="14" fill="none" stroke="#7b2fff" stroke-width="0.8"
+           stroke-opacity="0.25" transform="rotate(40 64 64)"/>
+
+  <!-- Corner dots -->
+  <circle cx="64" cy="14" r="2.5" fill="#00d9ff" opacity="0.7"/>
+  <circle cx="110" cy="64" r="2.5" fill="#00d9ff" opacity="0.7"/>
+  <circle cx="18"  cy="64" r="2.5" fill="#00d9ff" opacity="0.7"/>
+  <circle cx="64" cy="114" r="2.5" fill="#00d9ff" opacity="0.7"/>
+</svg>
