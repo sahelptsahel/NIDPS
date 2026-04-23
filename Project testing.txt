@@ -1,0 +1,146 @@
+⚠️ Prerequisites
+bash# Run these on Kali, targeting the machine running NIDPS
+TARGET="192.168.1.x"   # replace with your NIDPS machine IP
+
+# Tools needed (all pre-installed on Kali)
+sudo apt install nmap hping3 scapy ettercap-text-only -y
+
+1. 🔍 Port Scan
+bash# Fast SYN scan across all ports — triggers 20+ unique ports threshold
+sudo nmap -sS -T4 -p- $TARGET
+
+# Aggressive scan with version detection
+sudo nmap -A -T5 $TARGET
+
+# Quick top-1000 ports
+nmap -T4 $TARGET
+
+2. 💥 SYN Flood
+bash# hping3 SYN flood — 100+ SYN packets in 5 seconds
+sudo hping3 -S --flood -V -p 80 $TARGET
+
+# With random source IPs (spoofed)
+sudo hping3 -S --flood --rand-source -p 80 $TARGET
+
+# Target specific port with rate control
+sudo hping3 -S -p 443 --faster $TARGET
+
+3. 🌊 UDP Flood (DDoS)
+bash# UDP flood on port 53
+sudo hping3 --udp --flood -p 53 $TARGET
+
+# Random destination ports
+sudo hping3 --udp --flood --rand-dest $TARGET
+
+4. 🏓 ICMP Flood (DDoS)
+bash# Ping flood
+sudo hping3 --icmp --flood $TARGET
+
+# Standard ping flood
+sudo ping -f $TARGET
+
+# With large packet size
+sudo hping3 --icmp --flood -d 1400 $TARGET
+
+5. 🎄 XMAS Scan
+bash# Sets FIN + PSH + URG flags simultaneously
+sudo nmap -sX -T4 $TARGET
+
+# With hping3
+sudo hping3 -F -P -U -p 80 $TARGET
+
+# Full port range
+sudo nmap -sX -p- $TARGET
+
+6. 🕳️ NULL Scan
+bash# No flags set on TCP packets
+sudo nmap -sN -T4 $TARGET
+
+# With hping3 (no flags)
+sudo hping3 -p 80 $TARGET
+
+# Full port range
+sudo nmap -sN -p- $TARGET
+
+7. 🦠 Malware Communication (C2 Ports)
+bash# Connect to known malware C2 ports
+nc -zv $TARGET 4444      # Metasploit default
+nc -zv $TARGET 1337      # Elite/leet port
+nc -zv $TARGET 31337     # Back Orifice
+nc -zv $TARGET 12345     # NetBus
+nc -zv $TARGET 54321     # Back Orifice 2000
+
+# Scan all known C2 ports at once
+sudo nmap -p 4444,1337,31337,12345,54321 $TARGET
+
+8. 🚪 Suspicious Port Access
+bash# Telnet
+nc -zv $TARGET 23
+
+# RDP
+nc -zv $TARGET 3389
+
+# VNC
+nc -zv $TARGET 5900
+
+# IRC
+nc -zv $TARGET 6667
+
+# Scan all suspicious ports together
+sudo nmap -p 23,3389,5900,6667 $TARGET
+
+9. 📦 Malformed Packet
+bash# Send malformed TCP packet with invalid flags
+sudo hping3 --fin --syn -p 80 $TARGET    # FIN+SYN (invalid combo)
+
+# Oversized payload
+sudo hping3 -p 80 -d 65000 $TARGET
+
+# Using Scapy for fully custom malformed packet
+sudo scapy
+# Then inside scapy:
+>>> send(IP(dst="192.168.1.x", ihl=2)/TCP(dport=80))   # invalid IP header length
+
+10. 🧠 GNN Anomaly
+bash# Mix of unusual traffic to trigger the neural network
+# Slow port scan (unusual pattern)
+sudo nmap -sS -T1 --scan-delay 2s $TARGET
+
+# Unusual protocol combination
+sudo hping3 -p 80 --udp $TARGET     # UDP on HTTP port
+
+# High-entropy random payload
+sudo hping3 -p 443 -d 128 --rand-source $TARGET
+
+# Combined unusual sweep
+sudo nmap -sU -sS -T3 -p 1-1024 $TARGET
+
+🧪 All-in-One Test Script
+bash#!/bin/bash
+# Save as test_nidps.sh on Kali and run: sudo bash test_nidps.sh
+
+TARGET="192.168.1.x"   # ← change this
+
+echo "[1] Port Scan..."
+nmap -sS -T4 -p 1-1000 $TARGET &
+
+echo "[2] SYN Flood (5 sec)..."
+timeout 5 hping3 -S --flood -p 80 $TARGET &
+
+echo "[3] ICMP Flood (5 sec)..."
+timeout 5 hping3 --icmp --flood $TARGET &
+
+echo "[4] XMAS Scan..."
+nmap -sX -T4 $TARGET &
+
+echo "[5] NULL Scan..."
+nmap -sN -T4 $TARGET &
+
+echo "[6] C2 Port Probe..."
+nmap -p 4444,1337,31337,12345 $TARGET &
+
+echo "[7] Suspicious Ports..."
+nmap -p 23,3389,5900,6667 $TARGET &
+
+wait
+echo "Done — check NIDPS Alerts tab!"
